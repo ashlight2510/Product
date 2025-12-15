@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>하루 생산성 상태 결과</title>
+
+    <!-- ✅ Favicon (AUTO / 기본셋) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230f172a'/%3E%3Ctext x='50' y='62' font-size='52' text-anchor='middle' fill='white'%3E🧠%3C/text%3E%3C/svg%3E"
+    />
+
+    <!-- SEO / OG -->
+    <meta
+      name="description"
+      content="오늘 내 생산성 상태는? 1분 체크 결과와 오늘의 추천 행동을 확인하세요."
+    />
+    <meta property="og:title" content="하루 생산성 상태 결과" />
+    <meta
+      property="og:description"
+      content="오늘 내 뇌·에너지·집중 상태를 점검하고 바로 회복 루틴을 받기"
+    />
+    <meta
+      property="og:image"
+      content="https://dummyimage.com/1200x630/0f172a/ffffff&text=Daily+Productivity+Check"
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      .fade-in {
+        animation: fadeIn 0.25s ease-out both;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-50 text-slate-900">
+    <main class="min-h-screen px-4 py-8 sm:py-10">
+      <div class="mx-auto max-w-xl">
+        <!-- Header -->
+        <header class="mb-6">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-sm text-slate-500">1분 체크 결과</p>
+              <h1 class="text-2xl font-extrabold tracking-tight">
+                하루 생산성 상태
+              </h1>
+            </div>
+
+            <button
+              id="shareBtn"
+              class="shrink-0 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold shadow-sm hover:shadow transition active:scale-[0.99]"
+            >
+              공유
+            </button>
+          </div>
+        </header>
+
+        <!-- Score Card -->
+        <section
+          class="fade-in rounded-3xl bg-white p-5 shadow-sm border border-slate-200"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm text-slate-500">총점</p>
+              <div class="mt-1 flex items-end gap-2">
+                <div id="scoreText" class="text-4xl font-black tracking-tight">
+                  0
+                </div>
+                <div class="pb-1 text-sm text-slate-500">/ 24</div>
+              </div>
+              <p
+                id="typeTitle"
+                class="mt-2 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold"
+              >
+                상태 계산 중
+              </p>
+            </div>
+
+            <div
+              class="w-24 h-24 rounded-3xl bg-slate-100 flex items-center justify-center"
+            >
+              <span id="badgeEmoji" class="text-4xl">🧠</span>
+            </div>
+          </div>
+
+          <p
+            id="typeDesc"
+            class="mt-4 text-base leading-relaxed text-slate-700"
+          >
+            오늘의 생산성 상태를 분석하고 있어요.
+          </p>
+
+          <div class="mt-5">
+            <div
+              class="flex items-center justify-between text-xs text-slate-500"
+            >
+              <span>0</span><span>24</span>
+            </div>
+            <div
+              class="mt-2 h-3 w-full rounded-full bg-slate-100 overflow-hidden"
+            >
+              <div
+                id="bar"
+                class="h-full rounded-full bg-slate-900 transition-all"
+                style="width: 0%"
+              ></div>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
+              <span class="rounded-full bg-slate-100 px-2 py-1"
+                >🪫 0–6 방전</span
+              >
+              <span class="rounded-full bg-slate-100 px-2 py-1"
+                >🧯 7–13 누수</span
+              >
+              <span class="rounded-full bg-slate-100 px-2 py-1"
+                >⚙️ 14–19 실행</span
+              >
+              <span class="rounded-full bg-slate-100 px-2 py-1"
+                >🔥 20–24 고효율</span
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- Today Actions -->
+        <section
+          class="fade-in mt-5 rounded-3xl bg-white p-5 shadow-sm border border-slate-200"
+        >
+          <h2 class="text-lg font-extrabold tracking-tight">
+            오늘 추천 행동 3가지
+          </h2>
+          <p class="mt-1 text-sm text-slate-500">
+            상태에 맞춰 “당장 할 수 있는 것”만 골랐어요.
+          </p>
+
+          <ul id="actions" class="mt-4 space-y-3"></ul>
+
+          <div class="mt-5 flex gap-2">
+            <button
+              id="copyActionsBtn"
+              class="flex-1 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.99]"
+            >
+              추천 행동 복사
+            </button>
+            <button
+              id="retestBtn"
+              class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:shadow active:scale-[0.99]"
+            >
+              다시 테스트
+            </button>
+          </div>
+        </section>
+
+        <footer class="mt-8 text-center text-xs text-slate-400">
+          <p>
+            결과는 참고용이며, 컨디션·수면·스트레스에 따라 달라질 수 있어요.
+          </p>
+
+          <!-- ✅ 하단 공통 버튼 (기본셋) -->
+          <button
+            id="more-tests-btn"
+            type="button"
+            data-url="https://funnyfunny.cloud/"
+            class="w-full py-4 bg-white border border-purple-100 text-purple-700 font-semibold rounded-xl hover:bg-purple-50 hover:border-purple-200 transition-all duration-200 mt-4"
+          >
+            더 많은 테스트 해보기
+          </button>
+        </footer>
+      </div>
+    </main>
+
+    <script>
+      const MAX = 24;
+      const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+      const getScore = () => {
+        const params = new URLSearchParams(location.search);
+        const q = params.get("score");
+        if (q !== null && q !== "") return clamp(parseInt(q, 10) || 0, 0, MAX);
+        const ls = localStorage.getItem("prod_score");
+        if (ls !== null && ls !== "")
+          return clamp(parseInt(ls, 10) || 0, 0, MAX);
+        return 0;
+      };
+
+      const resultMap = [
+        {
+          min: 0,
+          max: 6,
+          emoji: "🪫",
+          title: "🪫 완전 방전 모드",
+          desc: "오늘은 ‘쉬는 게 일’인 날이에요. 억지로 밀면 내일 손해가 커질 수 있어요.",
+          actions: [
+            {
+              title: "중요 결정 미루기",
+              desc: "오늘은 결정 피로가 커요. 내일로 넘기기.",
+            },
+            {
+              title: "유지비 최소화",
+              desc: "할 일 1개만 ‘유지’ 수준으로 처리하기.",
+            },
+            {
+              title: "회복 루틴 20분",
+              desc: "낮잠/산책/샤워 중 하나만 택해서 리셋.",
+            },
+          ],
+        },
+        {
+          min: 7,
+          max: 13,
+          emoji: "🧯",
+          title: "🧯 에너지 누수 모드",
+          desc: "노력 대비 결과가 안 나오는 날. 의지 문제가 아니라 상태 문제일 가능성이 커요.",
+          actions: [
+            {
+              title: "회복 목표로 전환",
+              desc: "오늘은 ‘얼마나 했나’보다 ‘회복했나’가 핵심이에요.",
+            },
+            {
+              title: "작게 시작(5분)",
+              desc: "타이머 5분만 켜고 ‘첫 행동’만 하기.",
+            },
+            {
+              title: "정리 1칸",
+              desc: "책상/메모/탭 정리 하나만. 뇌 잡음 줄이기.",
+            },
+          ],
+        },
+        {
+          min: 14,
+          max: 19,
+          emoji: "⚙️",
+          title: "⚙️ 실행 가능 모드",
+          desc: "충분히 할 수는 있지만 새는 에너지가 있어요. ‘줄이기’ 하나만 해도 회복됩니다.",
+          actions: [
+            {
+              title: "할 일 1개 삭제",
+              desc: "오늘 목표를 ‘덜 하는 방향’으로 조정.",
+            },
+            {
+              title: "알림 1개 끄기",
+              desc: "가장 자주 흔들리는 앱 하나만 OFF.",
+            },
+            {
+              title: "핵심 업무 25분",
+              desc: "25분 집중 + 5분 휴식(딱 1세트만).",
+            },
+          ],
+        },
+        {
+          min: 20,
+          max: 24,
+          emoji: "🔥",
+          title: "🔥 고효율 모드",
+          desc: "오늘의 뇌는 최적화 상태예요. 지금 중요한 일부터 밀어붙이기 좋은 날.",
+          actions: [
+            {
+              title: "가장 큰 일 1개 먼저",
+              desc: "오늘의 에너지로 ‘가장 무거운 것’부터 끝내기.",
+            },
+            {
+              title: "딥워크 45분",
+              desc: "연속 집중 45분 1회만으로도 성과가 크게 나요.",
+            },
+            {
+              title: "무리 금지(내일 유지)",
+              desc: "마감 텐션 과열 금지. 내일도 같은 컨디션이 목표.",
+            },
+          ],
+        },
+      ];
+
+      const score = getScore();
+      const pct = Math.round((score / MAX) * 100);
+      const pick =
+        resultMap.find((r) => score >= r.min && score <= r.max) || resultMap[0];
+
+      // Bind
+      const scoreText = document.getElementById("scoreText");
+      const typeTitle = document.getElementById("typeTitle");
+      const typeDesc = document.getElementById("typeDesc");
+      const badgeEmoji = document.getElementById("badgeEmoji");
+      const bar = document.getElementById("bar");
+      const actions = document.getElementById("actions");
+
+      scoreText.textContent = score;
+      typeTitle.textContent = pick.title;
+      typeDesc.textContent = pick.desc;
+      badgeEmoji.textContent = pick.emoji;
+      bar.style.width = pct + "%";
+
+      actions.innerHTML = pick.actions
+        .map(
+          (a, idx) => `
+      <li class="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div class="mt-0.5 h-8 w-8 shrink-0 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-sm font-black">
+          ${idx + 1}
+        </div>
+        <div class="min-w-0">
+          <p class="font-bold text-slate-900">${escapeHtml(a.title)}</p>
+          <p class="mt-1 text-sm text-slate-600">${escapeHtml(a.desc)}</p>
+        </div>
+      </li>
+    `
+        )
+        .join("");
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      // Buttons
+      document.getElementById("retestBtn")?.addEventListener("click", () => {
+        location.href = "./index.html";
+      });
+
+      document
+        .getElementById("copyActionsBtn")
+        ?.addEventListener("click", async () => {
+          const text = [
+            `내 하루 생산성 상태: ${pick.title} (${score}/${MAX})`,
+            "",
+            "오늘 추천 행동 3가지",
+            ...pick.actions.map((a, i) => `${i + 1}. ${a.title} — ${a.desc}`),
+            "",
+            `🔗 ${location.origin + location.pathname}${
+              location.search || `?score=${score}`
+            }`,
+          ].join("\n");
+
+          try {
+            await navigator.clipboard.writeText(text);
+            toast("복사 완료!");
+          } catch (e) {
+            toast("복사 실패: 브라우저 권한을 확인해줘");
+          }
+        });
+
+      document
+        .getElementById("shareBtn")
+        ?.addEventListener("click", async () => {
+          const shareText = `내 하루 생산성 상태: ${pick.title} (${score}/${MAX})`;
+          const url = `${location.origin + location.pathname}?score=${score}`;
+
+          if (navigator.share) {
+            try {
+              await navigator.share({
+                title: "하루 생산성 상태",
+                text: shareText,
+                url,
+              });
+            } catch (e) {}
+          } else {
+            try {
+              await navigator.clipboard.writeText(`${shareText}\n${url}`);
+              toast("공유 문구 복사 완료!");
+            } catch (e) {
+              toast("공유 실패: 복사 권한을 확인해줘");
+            }
+          }
+        });
+
+      // ✅ 하단 공통 버튼 (기본셋)
+      document
+        .getElementById("more-tests-btn")
+        ?.addEventListener("click", (e) => {
+          const url = e.currentTarget.dataset.url;
+          if (url) window.open(url, "_blank", "noopener,noreferrer");
+        });
+
+      function toast(msg) {
+        const el = document.createElement("div");
+        el.className =
+          "fixed left-1/2 top-5 -translate-x-1/2 z-50 rounded-2xl bg-slate-900 text-white px-4 py-2 text-sm shadow-lg";
+        el.textContent = msg;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1600);
+      }
+    </script>
+  </body>
+</html>

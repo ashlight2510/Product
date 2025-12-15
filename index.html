@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>하루 생산성 체크 테스트</title>
+
+    <!-- ✅ Favicon (AUTO / 기본셋) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230f172a'/%3E%3Ctext x='50' y='62' font-size='52' text-anchor='middle' fill='white'%3E🧠%3C/text%3E%3C/svg%3E"
+    />
+
+    <!-- SEO / OG -->
+    <meta
+      name="description"
+      content="1분 만에 오늘의 집중·에너지·의사결정 상태를 체크하고 추천 행동 3가지를 받아보세요."
+    />
+    <meta property="og:title" content="하루 생산성 체크 테스트" />
+    <meta
+      property="og:description"
+      content="오늘 내 뇌·에너지·집중 상태는? 1분 체크로 바로 진단"
+    />
+    <meta
+      property="og:image"
+      content="https://dummyimage.com/1200x630/0f172a/ffffff&text=Daily+Productivity+Check"
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      .fade-in {
+        animation: fadeIn 0.22s ease-out both;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-50 text-slate-900">
+    <main class="min-h-screen px-4 py-8 sm:py-10">
+      <div class="mx-auto max-w-xl">
+        <header class="mb-6">
+          <p class="text-sm text-slate-500">1분 체크</p>
+          <h1 class="text-2xl font-extrabold tracking-tight">
+            하루 생산성 체크 테스트
+          </h1>
+          <p class="mt-2 text-sm text-slate-600">
+            오늘 내 집중/에너지/의사결정 상태를 빠르게 확인해요.
+          </p>
+        </header>
+
+        <!-- Card -->
+        <section
+          class="rounded-3xl bg-white p-5 shadow-sm border border-slate-200"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <div class="text-xs text-slate-500">
+              <span id="stepText">1</span> / <span id="totalText">8</span>
+            </div>
+            <button
+              id="resetBtn"
+              class="text-xs font-semibold text-slate-500 hover:text-slate-900"
+            >
+              초기화
+            </button>
+          </div>
+
+          <div
+            class="mt-3 h-2 w-full rounded-full bg-slate-100 overflow-hidden"
+          >
+            <div
+              id="progBar"
+              class="h-full rounded-full bg-slate-900 transition-all"
+              style="width: 12.5%"
+            ></div>
+          </div>
+
+          <div id="qWrap" class="fade-in mt-5">
+            <h2 id="qTitle" class="text-lg font-extrabold leading-snug">
+              오늘 해야 할 일을 떠올리면?
+            </h2>
+            <p id="qHint" class="mt-2 text-sm text-slate-500">
+              지금 ‘오늘 기준’으로 답해줘.
+            </p>
+
+            <div id="opts" class="mt-4 space-y-2">
+              <!-- injected -->
+            </div>
+
+            <div class="mt-5 flex items-center justify-between">
+              <button
+                id="backBtn"
+                class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:shadow disabled:opacity-40 disabled:hover:shadow-none"
+                disabled
+              >
+                이전
+              </button>
+
+              <div class="text-xs text-slate-500">⭕3 / ◯2 / △1 / ✕0</div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="mt-8 text-center text-xs text-slate-400">
+          <p>
+            결과는 참고용이며, 컨디션·수면·스트레스에 따라 달라질 수 있어요.
+          </p>
+
+          <!-- ✅ 하단 공통 버튼 (기본셋) -->
+          <button
+            id="more-tests-btn"
+            type="button"
+            data-url="https://funnyfunny.cloud/"
+            class="w-full py-4 bg-white border border-purple-100 text-purple-700 font-semibold rounded-xl hover:bg-purple-50 hover:border-purple-200 transition-all duration-200 mt-4"
+          >
+            더 많은 테스트 해보기
+          </button>
+        </footer>
+      </div>
+    </main>
+
+    <script>
+      const QUESTIONS = [
+        {
+          title: "오늘 해야 할 일을 떠올리면?",
+          hint: "지금 ‘오늘 기준’으로 답해줘.",
+          options: [
+            { label: "⭕ 바로 손이 간다", score: 3 },
+            { label: "◯ 미루고 싶지만 하긴 한다", score: 2 },
+            { label: "△ 생각만 해도 피곤하다", score: 1 },
+            { label: "✕ 아예 시작할 마음이 없다", score: 0 },
+          ],
+        },
+        {
+          title: "오늘 집중이 끊기는 주된 이유는?",
+          hint: "가장 큰 원인 1개만 고르기.",
+          options: [
+            { label: "⭕ 외부 방해 거의 없음", score: 3 },
+            { label: "◯ 알림·SNS", score: 2 },
+            { label: "△ 피로·졸림", score: 1 },
+            { label: "✕ 잡생각이 멈추지 않음", score: 0 },
+          ],
+        },
+        {
+          title: "오늘 가장 많이 한 행동은?",
+          hint: "오늘 실제로 가장 많이 한 것.",
+          options: [
+            { label: "⭕ 핵심 업무", score: 3 },
+            { label: "◯ 정리·보조 업무", score: 2 },
+            { label: "△ 의미 없는 웹서핑", score: 1 },
+            { label: "✕ 해야 할 걸 피하는 행동", score: 0 },
+          ],
+        },
+        {
+          title: "오늘 에너지 레벨은?",
+          hint: "하루 전체 체감 기준.",
+          options: [
+            { label: "⭕ 여유 있음", score: 3 },
+            { label: "◯ 보통", score: 2 },
+            { label: "△ 빨리 소진됨", score: 1 },
+            { label: "✕ 이미 방전 상태", score: 0 },
+          ],
+        },
+        {
+          title: "오늘 결정을 내리는 게 어땠나?",
+          hint: "사소한 결정 포함.",
+          options: [
+            { label: "⭕ 빠르고 명확", score: 3 },
+            { label: "◯ 고민은 있었음", score: 2 },
+            { label: "△ 사소한 것도 오래 고민", score: 1 },
+            { label: "✕ 결정 자체를 피함", score: 0 },
+          ],
+        },
+        {
+          title: "오늘 생산성을 방해한 가장 큰 요소는?",
+          hint: "가장 크게 체감된 1개.",
+          options: [
+            { label: "⭕ 없음", score: 3 },
+            { label: "◯ 일정 과다", score: 2 },
+            { label: "△ 감정 소모", score: 1 },
+            { label: "✕ 수면·컨디션 문제", score: 0 },
+          ],
+        },
+        {
+          title: "지금 이 테스트를 하는 이유는?",
+          hint: "오늘의 ‘심리 상태’에 가까운 답.",
+          options: [
+            { label: "⭕ 오늘 점검용", score: 3 },
+            { label: "◯ 생산성 회복용", score: 2 },
+            { label: "△ 죄책감 해소용", score: 1 },
+            { label: "✕ 아무것도 하기 싫어서", score: 0 },
+          ],
+        },
+        {
+          title: "오늘 하루를 한 문장으로 표현하면?",
+          hint: "가장 가까운 느낌.",
+          options: [
+            { label: "⭕ 잘 굴러갔다", score: 3 },
+            { label: "◯ 그럭저럭", score: 2 },
+            { label: "△ 비효율적이었다", score: 1 },
+            { label: "✕ 삭제하고 싶다", score: 0 },
+          ],
+        },
+      ];
+
+      const KEY = "prod_answers_v1";
+
+      const els = {
+        stepText: document.getElementById("stepText"),
+        totalText: document.getElementById("totalText"),
+        progBar: document.getElementById("progBar"),
+        qWrap: document.getElementById("qWrap"),
+        qTitle: document.getElementById("qTitle"),
+        qHint: document.getElementById("qHint"),
+        opts: document.getElementById("opts"),
+        backBtn: document.getElementById("backBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+      };
+
+      let state = loadState();
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(KEY);
+          if (!raw) return { idx: 0, scores: [] };
+          const parsed = JSON.parse(raw);
+          if (
+            !parsed ||
+            typeof parsed.idx !== "number" ||
+            !Array.isArray(parsed.scores)
+          ) {
+            return { idx: 0, scores: [] };
+          }
+          return parsed;
+        } catch {
+          return { idx: 0, scores: [] };
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(KEY, JSON.stringify(state));
+      }
+
+      function resetAll() {
+        state = { idx: 0, scores: [] };
+        localStorage.removeItem(KEY);
+        localStorage.removeItem("prod_score");
+        render();
+      }
+
+      function render() {
+        const total = QUESTIONS.length;
+        const idx = state.idx;
+
+        els.totalText.textContent = total;
+        els.stepText.textContent = Math.min(idx + 1, total);
+
+        const pct = Math.round((idx / total) * 100);
+        els.progBar.style.width = Math.max(8, pct) + "%";
+
+        els.backBtn.disabled = idx === 0;
+
+        const q = QUESTIONS[idx];
+        els.qTitle.textContent = q.title;
+        els.qHint.textContent = q.hint || "";
+
+        els.opts.innerHTML = q.options
+          .map((opt, i) => {
+            return `
+          <button
+            type="button"
+            data-score="${opt.score}"
+            class="w-full text-left rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-semibold shadow-sm hover:shadow transition active:scale-[0.99]">
+            ${escapeHtml(opt.label)}
+          </button>
+        `;
+          })
+          .join("");
+
+        // re-attach
+        els.opts.querySelectorAll("button[data-score]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const score = parseInt(btn.dataset.score, 10) || 0;
+            answer(score);
+          });
+        });
+
+        els.qWrap.classList.remove("fade-in");
+        void els.qWrap.offsetWidth;
+        els.qWrap.classList.add("fade-in");
+      }
+
+      function answer(score) {
+        state.scores[state.idx] = score;
+        state.idx += 1;
+        saveState();
+
+        if (state.idx >= QUESTIONS.length) {
+          const total = state.scores.reduce((a, b) => a + (b || 0), 0);
+          localStorage.setItem("prod_score", String(total));
+          location.href = `./result.html?score=${total}`;
+          return;
+        }
+        render();
+      }
+
+      function back() {
+        if (state.idx <= 0) return;
+        state.idx -= 1;
+        saveState();
+        render();
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      // events
+      els.backBtn.addEventListener("click", back);
+      els.resetBtn.addEventListener("click", resetAll);
+
+      // ✅ 하단 공통 버튼
+      document
+        .getElementById("more-tests-btn")
+        ?.addEventListener("click", (e) => {
+          const url = e.currentTarget.dataset.url;
+          if (url) window.open(url, "_blank", "noopener,noreferrer");
+        });
+
+      render();
+    </script>
+  </body>
+</html>
