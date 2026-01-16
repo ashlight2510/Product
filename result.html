@@ -87,23 +87,67 @@
         text-align: center;
 }
   </style>
+  <style>
+    .lang-switch {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: inline-flex;
+      gap: 0;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .lang-switch button {
+      border: none;
+      background: transparent;
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 44px;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .lang-switch button.active {
+      background: #0f172a;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4);
+    }
+    .lang-switch button:not(.active):hover {
+      background: rgba(15, 23, 42, 0.1);
+      color: rgba(0, 0, 0, 0.9);
+    }
+  </style>
 </head>
 
   <body class="bg-slate-50 text-slate-900">
+  <div class="lang-switch" role="tablist" aria-label="Language switcher">
+    <button type="button" data-lang="ko" class="active">KR</button>
+    <button type="button" data-lang="en">EN</button>
+  </div>
     <main class="min-h-screen px-4 py-8 sm:py-10">
       <div class="mx-auto max-w-xl">
         <!-- Header -->
         <header class="mb-6">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <p class="text-sm text-slate-500">1분 체크 결과</p>
-              <h1 class="text-2xl font-extrabold tracking-tight">
+              <p class="text-sm text-slate-500" data-i18n="resultHeaderBadge">1분 체크 결과</p>
+              <h1 class="text-2xl font-extrabold tracking-tight" data-i18n="resultTitle">
                 하루 생산성 상태
               </h1></div>
 
             <button
               id="shareBtn"
               class="shrink-0 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold shadow-sm hover:shadow transition active:scale-[0.99]"
+              data-i18n="shareBtn"
             >
               공유
             </button>
@@ -116,7 +160,7 @@
         >
           <div class="flex items-start justify-between gap-4">
             <div>
-              <p class="text-sm text-slate-500">총점</p>
+              <p class="text-sm text-slate-500" data-i18n="totalScore">총점</p>
               <div class="mt-1 flex items-end gap-2">
                 <div id="scoreText" class="text-4xl font-black tracking-tight">
                   0
@@ -127,7 +171,7 @@
                 id="typeTitle"
                 class="mt-2 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold"
               >
-                상태 계산 중
+                <span data-i18n="calculating">상태 계산 중</span>
               </p>
             </div>
 
@@ -141,7 +185,7 @@
             id="typeDesc"
             class="mt-4 text-base leading-relaxed text-slate-700"
           >
-            오늘의 생산성 상태를 분석하고 있어요.
+            <span data-i18n="analyzing">오늘의 생산성 상태를 분석하고 있어요.</span>
           </p>
 
           <div class="mt-5">
@@ -160,18 +204,10 @@
               ></div>
             </div>
             <div class="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
-              <span class="rounded-full bg-slate-100 px-2 py-1"
-                >🪫 0–6 방전</span
-              >
-              <span class="rounded-full bg-slate-100 px-2 py-1"
-                >🧯 7–13 누수</span
-              >
-              <span class="rounded-full bg-slate-100 px-2 py-1"
-                >⚙️ 14–19 실행</span
-              >
-              <span class="rounded-full bg-slate-100 px-2 py-1"
-                >🔥 20–24 고효율</span
-              >
+              <span class="rounded-full bg-slate-100 px-2 py-1" data-i18n="range0_6">🪫 0–6 방전</span>
+              <span class="rounded-full bg-slate-100 px-2 py-1" data-i18n="range7_13">🧯 7–13 누수</span>
+              <span class="rounded-full bg-slate-100 px-2 py-1" data-i18n="range14_19">⚙️ 14–19 실행</span>
+              <span class="rounded-full bg-slate-100 px-2 py-1" data-i18n="range20_24">🔥 20–24 고효율</span>
             </div>
           </div>
         </section>
@@ -180,11 +216,11 @@
         <section
           class="fade-in mt-5 rounded-3xl bg-white p-5 shadow-sm border border-slate-200"
         >
-          <h2 class="text-lg font-extrabold tracking-tight">
+          <h2 class="text-lg font-extrabold tracking-tight" data-i18n="actionsTitle">
             오늘 추천 행동 3가지
           </h2>
-          <p class="mt-1 text-sm text-slate-500">
-            상태에 맞춰 “당장 할 수 있는 것”만 골랐어요.
+          <p class="mt-1 text-sm text-slate-500" data-i18n="actionsDesc">
+            상태에 맞춰 "당장 할 수 있는 것"만 골랐어요.
           </p>
 
           <ul id="actions" class="mt-4 space-y-3"></ul>
@@ -193,12 +229,14 @@
             <button
               id="copyActionsBtn"
               class="flex-1 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.99]"
+              data-i18n="copyActionsBtn"
             >
               추천 행동 복사
             </button>
             <button
               id="retestBtn"
               class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:shadow active:scale-[0.99]"
+              data-i18n="retestBtn"
             >
               다시 테스트
             </button>
@@ -206,7 +244,7 @@
         </section>
 
         <footer class="mt-8 text-center text-xs text-slate-400">
-          <p>
+          <p data-i18n="footerNote">
             결과는 참고용이며, 컨디션·수면·스트레스에 따라 달라질 수 있어요.
           </p>
 
@@ -216,6 +254,7 @@
             type="button"
             data-url="https://funnyfunny.cloud/"
             class="w-full py-4 bg-white border border-purple-100 text-purple-700 font-semibold rounded-xl hover:bg-purple-50 hover:border-purple-200 transition-all duration-200 mt-4"
+            data-i18n="moreTestsBtn"
           >
             더 많은 테스트 해보기
           </button>
@@ -224,6 +263,142 @@
     </main>
 
     <script>
+      // =========================
+      // i18n
+      // =========================
+      const translations = {
+        ko: {
+          metaTitle: "하루 생산성 상태 결과",
+          metaDescription: "오늘 내 생산성 상태는? 1분 체크 결과와 오늘의 추천 행동을 확인하세요.",
+          resultHeaderBadge: "1분 체크 결과",
+          resultTitle: "하루 생산성 상태",
+          shareBtn: "공유",
+          totalScore: "총점",
+          calculating: "상태 계산 중",
+          analyzing: "오늘의 생산성 상태를 분석하고 있어요.",
+          range0_6: "🪫 0–6 방전",
+          range7_13: "🧯 7–13 누수",
+          range14_19: "⚙️ 14–19 실행",
+          range20_24: "🔥 20–24 고효율",
+          actionsTitle: "오늘 추천 행동 3가지",
+          actionsDesc: "상태에 맞춰 \"당장 할 수 있는 것\"만 골랐어요.",
+          copyActionsBtn: "추천 행동 복사",
+          retestBtn: "다시 테스트",
+          footerNote: "결과는 참고용이며, 컨디션·수면·스트레스에 따라 달라질 수 있어요.",
+          moreTestsBtn: "더 많은 테스트 해보기",
+          toastCopySuccess: "복사 완료!",
+          toastCopyFailed: "복사 실패: 브라우저 권한을 확인해줘",
+          toastShareSuccess: "공유 문구 복사 완료!",
+          toastShareFailed: "공유 실패: 복사 권한을 확인해줘",
+          shareTitle: "하루 생산성 상태",
+          shareTextTemplate: "내 하루 생산성 상태: {title} ({score}/{max})",
+          actionsHeader: "오늘 추천 행동 3가지",
+        },
+        en: {
+          metaTitle: "Daily Productivity Status Result",
+          metaDescription: "What's my productivity status today? Check the 1-minute check result and today's recommended actions.",
+          resultHeaderBadge: "1-min Check Result",
+          resultTitle: "Daily Productivity Status",
+          shareBtn: "Share",
+          totalScore: "Total Score",
+          calculating: "Calculating status",
+          analyzing: "Analyzing today's productivity status.",
+          range0_6: "🪫 0–6 Depleted",
+          range7_13: "🧯 7–13 Leakage",
+          range14_19: "⚙️ 14–19 Executable",
+          range20_24: "🔥 20–24 High Efficiency",
+          actionsTitle: "3 Recommended Actions for Today",
+          actionsDesc: "Selected only things you can do right away based on your status.",
+          copyActionsBtn: "Copy Actions",
+          retestBtn: "Retest",
+          footerNote: "Results are for reference only and may vary depending on condition·sleep·stress.",
+          moreTestsBtn: "Explore More Tests",
+          toastCopySuccess: "Copied!",
+          toastCopyFailed: "Copy failed: Check browser permissions",
+          toastShareSuccess: "Share text copied!",
+          toastShareFailed: "Share failed: Check copy permissions",
+          shareTitle: "Daily Productivity Status",
+          shareTextTemplate: "My daily productivity status: {title} ({score}/{max})",
+          actionsHeader: "3 Recommended Actions for Today",
+        },
+      };
+
+      const defaultLang = "ko";
+      const supportedLangs = ["ko", "en"];
+      let currentLang = defaultLang;
+
+      function t(key, vars = {}) {
+        const langTable = translations[currentLang] || translations.ko;
+        let template = langTable?.[key] ?? translations.ko?.[key] ?? key;
+        if (typeof template !== "string") return template;
+        Object.keys(vars).forEach((k) => {
+          template = template.replace(new RegExp(`\\{${k}\\}`, "g"), vars[k]);
+        });
+        return template;
+      }
+
+      function applyTranslations() {
+        document.title = t("metaTitle");
+        const descMeta = document.querySelector('meta[name="description"]');
+        if (descMeta) descMeta.setAttribute("content", t("metaDescription"));
+        document.documentElement.lang = currentLang;
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t(el.dataset.i18n);
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+          el.innerHTML = t(el.dataset.i18nHtml);
+        });
+      }
+
+      function detectLang() {
+        const params = new URLSearchParams(window.location.search);
+        const paramLang = params.get("lang");
+        if (supportedLangs.includes(paramLang)) return paramLang;
+        const stored = localStorage.getItem("preferredLang");
+        if (supportedLangs.includes(stored)) return stored;
+        const browserLang =
+          navigator.languages && navigator.languages.length
+            ? navigator.languages[0]
+            : navigator.language;
+        if (browserLang && browserLang.toLowerCase().startsWith("ko")) {
+          return "ko";
+        }
+        return defaultLang;
+      }
+
+      function setLang(lang, options = {}) {
+        const nextLang = supportedLangs.includes(lang) ? lang : defaultLang;
+        currentLang = nextLang;
+        window.currentLang = currentLang;
+        document.documentElement.lang = nextLang;
+        localStorage.setItem("preferredLang", nextLang);
+        document.querySelectorAll(".lang-switch button").forEach((button) => {
+          button.classList.toggle("active", button.dataset.lang === nextLang);
+        });
+        applyTranslations();
+        if (options.forceUpdate && typeof window.renderResult === "function") {
+          window.renderResult();
+        }
+        if (options.updateUrl) {
+          const url = new URL(window.location.href);
+          url.searchParams.set("lang", nextLang);
+          window.history.replaceState({}, "", url);
+        }
+      }
+
+      document.querySelectorAll(".lang-switch button").forEach((button) => {
+        button.addEventListener("click", () => {
+          setLang(button.dataset.lang, { updateUrl: true, forceUpdate: true });
+        });
+      });
+
+      setLang(detectLang(), { updateUrl: false, forceUpdate: false });
+
+      // Make t() function and currentLang globally available
+      window.t = t;
+      window.currentLang = currentLang;
+      window.setLang = setLang;
+
       const MAX = 24;
       const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
       const getScore = () => {
@@ -242,19 +417,27 @@
           max: 6,
           emoji: "🪫",
           title: "🪫 완전 방전 모드",
-          desc: "오늘은 ‘쉬는 게 일’인 날이에요. 억지로 밀면 내일 손해가 커질 수 있어요.",
+          titleEn: "🪫 Completely Depleted Mode",
+          desc: "오늘은 '쉬는 게 일'인 날이에요. 억지로 밀면 내일 손해가 커질 수 있어요.",
+          descEn: "Today is a day when 'resting is work'. Forcing yourself may cause bigger losses tomorrow.",
           actions: [
             {
               title: "중요 결정 미루기",
+              titleEn: "Delay Important Decisions",
               desc: "오늘은 결정 피로가 커요. 내일로 넘기기.",
+              descEn: "Decision fatigue is high today. Postpone to tomorrow.",
             },
             {
               title: "유지비 최소화",
-              desc: "할 일 1개만 ‘유지’ 수준으로 처리하기.",
+              titleEn: "Minimize Maintenance",
+              desc: "할 일 1개만 '유지' 수준으로 처리하기.",
+              descEn: "Handle only 1 task at 'maintenance' level.",
             },
             {
               title: "회복 루틴 20분",
+              titleEn: "20-Min Recovery Routine",
               desc: "낮잠/산책/샤워 중 하나만 택해서 리셋.",
+              descEn: "Choose one: nap/walk/shower to reset.",
             },
           ],
         },
@@ -263,19 +446,27 @@
           max: 13,
           emoji: "🧯",
           title: "🧯 에너지 누수 모드",
+          titleEn: "🧯 Energy Leakage Mode",
           desc: "노력 대비 결과가 안 나오는 날. 의지 문제가 아니라 상태 문제일 가능성이 커요.",
+          descEn: "A day when results don't match effort. More likely a state issue than a willpower issue.",
           actions: [
             {
               title: "회복 목표로 전환",
-              desc: "오늘은 ‘얼마나 했나’보다 ‘회복했나’가 핵심이에요.",
+              titleEn: "Switch to Recovery Goal",
+              desc: "오늘은 '얼마나 했나'보다 '회복했나'가 핵심이에요.",
+              descEn: "Today, 'did I recover' is more important than 'how much did I do'.",
             },
             {
               title: "작게 시작(5분)",
-              desc: "타이머 5분만 켜고 ‘첫 행동’만 하기.",
+              titleEn: "Start Small (5 min)",
+              desc: "타이머 5분만 켜고 '첫 행동'만 하기.",
+              descEn: "Set timer for 5 minutes and do only the 'first action'.",
             },
             {
               title: "정리 1칸",
+              titleEn: "Organize One Space",
               desc: "책상/메모/탭 정리 하나만. 뇌 잡음 줄이기.",
+              descEn: "Organize one: desk/memo/tabs. Reduce mental noise.",
             },
           ],
         },
@@ -284,19 +475,27 @@
           max: 19,
           emoji: "⚙️",
           title: "⚙️ 실행 가능 모드",
-          desc: "충분히 할 수는 있지만 새는 에너지가 있어요. ‘줄이기’ 하나만 해도 회복됩니다.",
+          titleEn: "⚙️ Executable Mode",
+          desc: "충분히 할 수는 있지만 새는 에너지가 있어요. '줄이기' 하나만 해도 회복됩니다.",
+          descEn: "You can do enough, but there's energy leakage. Just 'reduce' one thing to recover.",
           actions: [
             {
               title: "할 일 1개 삭제",
-              desc: "오늘 목표를 ‘덜 하는 방향’으로 조정.",
+              titleEn: "Delete 1 Task",
+              desc: "오늘 목표를 '덜 하는 방향'으로 조정.",
+              descEn: "Adjust today's goal to 'do less' direction.",
             },
             {
               title: "알림 1개 끄기",
+              titleEn: "Turn Off 1 Notification",
               desc: "가장 자주 흔들리는 앱 하나만 OFF.",
+              descEn: "Turn OFF only the app that distracts you most.",
             },
             {
               title: "핵심 업무 25분",
+              titleEn: "Core Work 25 min",
               desc: "25분 집중 + 5분 휴식(딱 1세트만).",
+              descEn: "25 min focus + 5 min break (just 1 set).",
             },
           ],
         },
@@ -305,19 +504,27 @@
           max: 24,
           emoji: "🔥",
           title: "🔥 고효율 모드",
+          titleEn: "🔥 High Efficiency Mode",
           desc: "오늘의 뇌는 최적화 상태예요. 지금 중요한 일부터 밀어붙이기 좋은 날.",
+          descEn: "Today's brain is optimized. A good day to push through important tasks first.",
           actions: [
             {
               title: "가장 큰 일 1개 먼저",
-              desc: "오늘의 에너지로 ‘가장 무거운 것’부터 끝내기.",
+              titleEn: "Do the Biggest Task First",
+              desc: "오늘의 에너지로 '가장 무거운 것'부터 끝내기.",
+              descEn: "Finish the 'heaviest thing' first with today's energy.",
             },
             {
               title: "딥워크 45분",
+              titleEn: "Deep Work 45 min",
               desc: "연속 집중 45분 1회만으로도 성과가 크게 나요.",
+              descEn: "Just one 45-minute focused session yields great results.",
             },
             {
               title: "무리 금지(내일 유지)",
+              titleEn: "No Overexertion (Maintain Tomorrow)",
               desc: "마감 텐션 과열 금지. 내일도 같은 컨디션이 목표.",
+              descEn: "No deadline tension overheating. Goal is to maintain the same condition tomorrow.",
             },
           ],
         },
@@ -336,27 +543,33 @@
       const bar = document.getElementById("bar");
       const actions = document.getElementById("actions");
 
-      scoreText.textContent = score;
-      typeTitle.textContent = pick.title;
-      typeDesc.textContent = pick.desc;
-      badgeEmoji.textContent = pick.emoji;
-      bar.style.width = pct + "%";
+      function renderResult() {
+        const isEn = currentLang === "en";
+        scoreText.textContent = score;
+        typeTitle.textContent = isEn ? (pick.titleEn || pick.title) : pick.title;
+        typeDesc.textContent = isEn ? (pick.descEn || pick.desc) : pick.desc;
+        badgeEmoji.textContent = pick.emoji;
+        bar.style.width = pct + "%";
 
-      actions.innerHTML = pick.actions
-        .map(
-          (a, idx) => `
-      <li class="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <div class="mt-0.5 h-8 w-8 shrink-0 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-sm font-black">
-          ${idx + 1}
-        </div>
-        <div class="min-w-0">
-          <p class="font-bold text-slate-900">${escapeHtml(a.title)}</p>
-          <p class="mt-1 text-sm text-slate-600">${escapeHtml(a.desc)}</p>
-        </div>
-      </li>
-    `
-        )
-        .join("");
+        actions.innerHTML = pick.actions
+          .map(
+            (a, idx) => `
+        <li class="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div class="mt-0.5 h-8 w-8 shrink-0 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-sm font-black">
+            ${idx + 1}
+          </div>
+          <div class="min-w-0">
+            <p class="font-bold text-slate-900">${escapeHtml(isEn ? (a.titleEn || a.title) : a.title)}</p>
+            <p class="mt-1 text-sm text-slate-600">${escapeHtml(isEn ? (a.descEn || a.desc) : a.desc)}</p>
+          </div>
+        </li>
+      `
+          )
+          .join("");
+      }
+
+      window.renderResult = renderResult;
+      renderResult();
 
       function escapeHtml(str) {
         return String(str)
@@ -375,11 +588,17 @@
       document
         .getElementById("copyActionsBtn")
         ?.addEventListener("click", async () => {
+          const isEn = currentLang === "en";
+          const title = isEn ? (pick.titleEn || pick.title) : pick.title;
           const text = [
-            `내 하루 생산성 상태: ${pick.title} (${score}/${MAX})`,
+            t("shareTextTemplate", { title, score, max: MAX }),
             "",
-            "오늘 추천 행동 3가지",
-            ...pick.actions.map((a, i) => `${i + 1}. ${a.title} — ${a.desc}`),
+            t("actionsHeader"),
+            ...pick.actions.map((a, i) => {
+              const actionTitle = isEn ? (a.titleEn || a.title) : a.title;
+              const actionDesc = isEn ? (a.descEn || a.desc) : a.desc;
+              return `${i + 1}. ${actionTitle} — ${actionDesc}`;
+            }),
             "",
             `🔗 ${location.origin + location.pathname}${
               location.search || `?score=${score}`
@@ -388,22 +607,24 @@
 
           try {
             await navigator.clipboard.writeText(text);
-            toast("복사 완료!");
+            toast(t("toastCopySuccess"));
           } catch (e) {
-            toast("복사 실패: 브라우저 권한을 확인해줘");
+            toast(t("toastCopyFailed"));
           }
         });
 
       document
         .getElementById("shareBtn")
         ?.addEventListener("click", async () => {
-          const shareText = `내 하루 생산성 상태: ${pick.title} (${score}/${MAX})`;
+          const isEn = currentLang === "en";
+          const title = isEn ? (pick.titleEn || pick.title) : pick.title;
+          const shareText = t("shareTextTemplate", { title, score, max: MAX });
           const url = `${location.origin + location.pathname}?score=${score}`;
 
           if (navigator.share) {
             try {
               await navigator.share({
-                title: "하루 생산성 상태",
+                title: t("shareTitle"),
                 text: shareText,
                 url,
               });
@@ -411,9 +632,9 @@
           } else {
             try {
               await navigator.clipboard.writeText(`${shareText}\n${url}`);
-              toast("공유 문구 복사 완료!");
+              toast(t("toastShareSuccess"));
             } catch (e) {
-              toast("공유 실패: 복사 권한을 확인해줘");
+              toast(t("toastShareFailed"));
             }
           }
         });
