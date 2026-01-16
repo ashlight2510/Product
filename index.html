@@ -172,12 +172,8 @@
           </div>
 
           <div id="qWrap" class="fade-in mt-5">
-            <h2 id="qTitle" class="text-lg font-extrabold leading-snug">
-              오늘 해야 할 일을 떠올리면?
-            </h2>
-            <p id="qHint" class="mt-2 text-sm text-slate-500">
-              지금 ‘오늘 기준’으로 답해줘.
-            </p>
+            <h2 id="qTitle" class="text-lg font-extrabold leading-snug"></h2>
+            <p id="qHint" class="mt-2 text-sm text-slate-500"></p>
 
             <div id="opts" class="mt-4 space-y-2">
               <!-- injected -->
@@ -303,7 +299,8 @@
           button.classList.toggle("active", button.dataset.lang === nextLang);
         });
         applyTranslations();
-        if (options.forceUpdate && typeof window.render === "function") {
+        // Always update questions when language changes
+        if (typeof window.render === "function") {
           window.render();
         }
         if (options.updateUrl) {
@@ -312,14 +309,6 @@
           window.history.replaceState({}, "", url);
         }
       }
-
-      document.querySelectorAll(".lang-switch button").forEach((button) => {
-        button.addEventListener("click", () => {
-          setLang(button.dataset.lang, { updateUrl: true, forceUpdate: true });
-        });
-      });
-
-      setLang(detectLang(), { updateUrl: false, forceUpdate: false });
 
       // Make t() function and currentLang globally available
       window.t = t;
@@ -562,6 +551,16 @@
       // Make render globally available for i18n
       window.render = render;
 
+      // Set up language switching
+      document.querySelectorAll(".lang-switch button").forEach((button) => {
+        button.addEventListener("click", () => {
+          setLang(button.dataset.lang, { updateUrl: true });
+        });
+      });
+
+      // Initialize language and render
+      setLang(detectLang(), { updateUrl: false });
+
       // events
       els.backBtn.addEventListener("click", back);
       els.resetBtn.addEventListener("click", resetAll);
@@ -573,8 +572,6 @@
           const url = e.currentTarget.dataset.url;
           if (url) window.open(url, "_blank", "noopener,noreferrer");
         });
-
-      render();
     </script>
   
 <ins class="adsbygoogle"

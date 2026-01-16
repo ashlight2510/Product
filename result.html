@@ -376,7 +376,8 @@
           button.classList.toggle("active", button.dataset.lang === nextLang);
         });
         applyTranslations();
-        if (options.forceUpdate && typeof window.renderResult === "function") {
+        // Always update result when language changes
+        if (typeof window.renderResult === "function") {
           window.renderResult();
         }
         if (options.updateUrl) {
@@ -385,14 +386,6 @@
           window.history.replaceState({}, "", url);
         }
       }
-
-      document.querySelectorAll(".lang-switch button").forEach((button) => {
-        button.addEventListener("click", () => {
-          setLang(button.dataset.lang, { updateUrl: true, forceUpdate: true });
-        });
-      });
-
-      setLang(detectLang(), { updateUrl: false, forceUpdate: false });
 
       // Make t() function and currentLang globally available
       window.t = t;
@@ -569,7 +562,16 @@
       }
 
       window.renderResult = renderResult;
-      renderResult();
+      
+      // Set up language switching
+      document.querySelectorAll(".lang-switch button").forEach((button) => {
+        button.addEventListener("click", () => {
+          setLang(button.dataset.lang, { updateUrl: true });
+        });
+      });
+
+      // Initialize language and render
+      setLang(detectLang(), { updateUrl: false });
 
       function escapeHtml(str) {
         return String(str)
